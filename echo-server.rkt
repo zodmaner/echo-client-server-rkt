@@ -30,15 +30,11 @@
   (define buffer (make-bytes 4086))
   (define (read-write-loop)
     (define num-read-bytes (read-bytes-avail! buffer in))
-    (when (and (not (eof-object? num-read-bytes))
-               (not (string=? "exit\r\n"
-                              ; converts to string and trims off garbage bytes
-                              (substring
-                               (bytes->string/utf-8 buffer) 0 6))))
+    (when (not (eof-object? num-read-bytes))
       ;; using write-bytes-avail, we don't need to call flush-output
       ;; or close-output-port in order to send data
       (write-bytes-avail buffer out 0 num-read-bytes)
       (read-write-loop)))
-  ;; now, we loop forever until user disconnects, issues the "exit" command,
+  ;; now, we loop forever until user disconnects
   ;; or we explicitly stop the server ourselves
   (read-write-loop))

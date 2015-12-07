@@ -1,5 +1,7 @@
 #lang racket
 
+;; A simple multi-threaded echo server. Returns a function
+;; that can be used to properly shutdown the server.
 (define (echo-server port)
   (define server-cust (make-custodian))
   (parameterize ([current-custodian server-cust])
@@ -11,6 +13,9 @@
   (λ ()
     (custodian-shutdown-all server-cust)))
 
+;; A simple multi-threaded accept and handle function.
+;; Will automatically close any connection that hangs for
+;; longer than 10 seconds.
 (define (accept-and-handle listener)
   (define cust (make-custodian))
   (parameterize ([current-custodian cust])
@@ -24,8 +29,9 @@
             (sleep 10)
             (custodian-shutdown-all cust))))
 
-;; A "simplified" version of Racket's copy-port, with some modifications
-;; so that it recognizes an exit command.
+;; A handle function, which implements a "simplified" version of
+;; Racket's copy-port (which seems to be the best and most reliable
+;; way of reading and writing data to and from TCP ports in Racket).
 (define (handle in out)
   (define buffer (make-bytes 4086))
   (define (read-write-loop)

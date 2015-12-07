@@ -25,14 +25,14 @@
             (custodian-shutdown-all cust))))
 
 ;; A "simplified" version of Racket's copy-port, with some modifications
-;; so that it recognizes an exit command
+;; so that it recognizes an exit command.
 (define (handle in out)
   (define buffer (make-bytes 4086))
   (define (read-write-loop)
     (define num-read-bytes (read-bytes-avail! buffer in))
     (when (and (not (eof-object? num-read-bytes))
                (not (string=? "exit\r\n" (substring
-                                          (bytes->string/utf-8 buffer) 0 6))))
+                                          (bytes->string/utf-8 buffer) 0 6)))) ; trims off bytes with garbage/no data
       ;; using write-bytes-avail, we don't need to call flush-output
       ;; or close-output-port in order to send data
       (write-bytes-avail buffer out 0 num-read-bytes)

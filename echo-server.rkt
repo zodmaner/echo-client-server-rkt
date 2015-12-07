@@ -31,8 +31,10 @@
   (define (read-write-loop)
     (define num-read-bytes (read-bytes-avail! buffer in))
     (when (and (not (eof-object? num-read-bytes))
-               (not (string=? "exit\r\n" (substring
-                                          (bytes->string/utf-8 buffer) 0 6)))) ; trims off bytes with garbage/no data
+               (not (string=? "exit\r\n"
+                              ; converts to string and trims off garbage bytes
+                              (substring
+                               (bytes->string/utf-8 buffer) 0 6))))
       ;; using write-bytes-avail, we don't need to call flush-output
       ;; or close-output-port in order to send data
       (write-bytes-avail buffer out 0 num-read-bytes)

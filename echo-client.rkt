@@ -16,8 +16,10 @@
       ;; reads data from a server and stores them inside a buffer
       (define read-buffer (make-bytes 4086))
       (define num-read-bytes (read-bytes-avail! read-buffer in))
-      (fprintf (current-output-port) "~A~%" (substring
-                                             (bytes->string/utf-8 read-buffer) 0 num-read-bytes)) ; trims off bytes with garbage/no data
+      (fprintf (current-output-port) "~A~%"
+               ; converts to string and trims off garbage bytes
+               (substring
+                (bytes->string/utf-8 read-buffer) 0 num-read-bytes))
       (when (not (string=? "exit" (substring
                                    (bytes->string/utf-8 read-buffer) 0 4)))
         (loop))))

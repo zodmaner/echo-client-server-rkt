@@ -22,7 +22,7 @@
                 (bytes->string/utf-8 read-buffer) 0 num-read-bytes))
       (when (not (string=? "exit"
                            (substring
-                                   (bytes->string/utf-8 read-buffer) 0 4)))
+                            (bytes->string/utf-8 read-buffer) 0 4)))
         (loop))))
   (loop)
   (close-input-port in)

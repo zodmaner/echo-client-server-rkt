@@ -14,20 +14,13 @@
     (custodian-shutdown-all server-cust)))
 
 ;; A simple multi-threaded accept and handle function.
-;; Will automatically close any connection that hangs for
-;; longer than 10 seconds.
 (define (accept-and-handle listener)
-  (define cust (make-custodian))
-  (parameterize ([current-custodian cust])
-    (define-values (in out) (tcp-accept listener))
-    (thread
-     (λ ()
-       (handle in out)
-       (close-input-port in)
-       (close-output-port out))))
-  (thread (λ ()
-            (sleep 10)
-            (custodian-shutdown-all cust))))
+  (define-values (in out) (tcp-accept listener))
+  (thread
+   (λ ()
+     (handle in out)
+     (close-input-port in)
+     (close-output-port out))))
 
 ;; A handle function, which implements a "simplified" version of
 ;; Racket's copy-port (which seems to be the best and most reliable

@@ -1,19 +1,23 @@
 #lang racket
 
+;; A simple echo client, using the read & write bytes functions
+;; to transfer data (which seems to be the most reliable means of
+;; transferring data through TCP ports in Racket.
 (define (echo-client port)
   (define-values (in out) (tcp-connect "127.0.0.1" port))
   (define (loop)
-    ;; read-bytes-line (and read-line) only seems to block properly
-    ;; when running from a command line or DrRacket
+    ;; *note* read-bytes-line (and read-line) only seems to properly
+    ;; block for user inputs when running from a command line or DrRacket
     (define echo-text (read-bytes-line (current-input-port)))
     (when (not (eof-object? echo-text))
       (define echo-text-length (bytes-length echo-text))
+      ;; writes data to a server
       (write-bytes-avail echo-text out 0 echo-text-length)
       ;; reads data from a server and stores them inside a buffer
       (define read-buffer (make-bytes 4086))
       (define num-read-bytes (read-bytes-avail! read-buffer in))
       (fprintf (current-output-port) "~A~%" (substring
-                                             (bytes->string/utf-8 read-buffer) 0 num-read-bytes))
+                                             (bytes->string/utf-8 read-buffer) 0 num-read-bytes)) ; trims off the bytes with garbage/no data
       (when (not (string=? "exit" (substring
                                    (bytes->string/utf-8 read-buffer) 0 4)))
         (loop))))

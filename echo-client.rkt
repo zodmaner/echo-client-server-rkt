@@ -10,8 +10,11 @@
   (define (loop)
     ;; *note* read-bytes-line (and read-line) only seems to properly
     ;; block for user inputs when running from a command line or DrRacket
-    (define echo-text (read-bytes-line (current-input-port)))
-    (when (not (eof-object? echo-text))
+    (define raw-echo-text (read-bytes-line (current-input-port)))
+    (when (not (eof-object? raw-echo-text))
+      ;; appends the return and linefeed characters to user's input
+      (define echo-text (bytes-append raw-echo-text
+                                      (list->bytes '(13 10))))
       (define echo-text-length (bytes-length echo-text))
       ;; writes data to a server
       (write-bytes-avail echo-text out 0 echo-text-length)
